@@ -9,7 +9,7 @@ WITH user_calcs AS (
     , count(g.order_number) OVER (PARTITION BY user_id) AS num_orders
     , min(g.created_at) OVER(PARTITION BY user_id) AS first_order_timestamp
     , max(g.created_at) OVER(PARTITION BY user_id) AS last_order_timestamp
-  FROM my_orders AS g
+  FROM orders_raw AS g
 ), last_order_facts AS (
   SELECT
     u.user_id
@@ -20,14 +20,14 @@ WITH user_calcs AS (
     , o.name last_order_product
     , o.buyer_accepts_marketing 
   FROM user_calcs u
-  LEFT JOIN my_orders o ON u.user_id = o.user_id AND u.last_order_timestamp = o.created_at
+  LEFT JOIN orders_raw o ON u.user_id = o.user_id AND u.last_order_timestamp = o.created_at
 ), first_order_facts AS (
   SELECT
     u.user_id
     , u.first_order_timestamp
     , o.name first_order_product
   FROM user_calcs u
-  LEFT JOIN my_orders o ON u.user_id = o.user_id AND u.first_order_timestamp = o.created_at
+  LEFT JOIN orders_raw o ON u.user_id = o.user_id AND u.first_order_timestamp = o.created_at
 )
 SELECT 
   u.user_id
@@ -68,5 +68,5 @@ SELECT
   , round(total_price_usd::numeric,2) AS total_price_usd
   , round(total_tax::numeric,2) AS total_tax
   , total_weight  
-FROM my_orders
+FROM orders_raw
 WHERE test = FALSE;
