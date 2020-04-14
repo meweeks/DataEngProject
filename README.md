@@ -33,11 +33,28 @@ Transform and load data from s3 into an PSQL database and create user and order 
 		- `RunTransformationPipeline.json` - pipeline definition
 		- `TransformationScripts.sql` - scripts to create orders_table and users_table
 
+**AWS Data Pipeline DAGs**
+
+DAGs created on local AWS account using my JSON files copied to my S3 folder and database instance.
+
+JSON to CSV Backill DAG:
+
+![JSONtoCSVBackfillDag](JSONtoCSVBackfillDag.png)
+
+S3toRDSDatabase DAG:
+
+![S3toRDSDatabaseDag](S3toRDSDatabaseDag.png)
+
+RunTransformation DAG:
+
+![RunTransformationDag](RunTransformationDag.png)
+
 **Next Steps** 
 - Change get data process to append JSON directly instead of transforming to CSV and load JSON data into the database; originally chose to transform the data for a different approach to the assignment
 - Create Schedules.yaml file run pipelines with dependencies
 - Add Schedules parameter to individual pipelines to reference
 - Configure AWS + S3 using glossier's stack; having access to roles, etc. for productionizing the pipelines 
+- Deploy pipelines using DAGs above
 - Create additional transformations
 	- parse json line_items field
 	- create order_details table
