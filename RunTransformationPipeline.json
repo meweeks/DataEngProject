@@ -1,0 +1,44 @@
+{
+  "objects": [
+    {
+      "database": {
+        "ref": "DatabaseId_IsGG9"
+      },
+      "scriptUri": "s3://data-eng-project2020/Scripts/TransformationScripts.sql",
+      "name": "TransformData",
+      "runsOn": {
+        "ref": "ResourceId_nRevu"
+      },
+      "id": "SqlActivityId_FlnCY",
+      "type": "SqlActivity"
+    },
+    {
+      "resourceRole": "DataPipelineDefaultResourceRole",
+      "role": "DataPipelineDefaultRole",
+      "instanceType": "t1.micro",
+      "name": "EC2Instance",
+      "id": "ResourceId_nRevu",
+      "type": "Ec2Resource",
+      "terminateAfter": "10 Minutes"
+    },
+    {
+      "databaseName": "<DatabaseName",
+      "*password": "<Password>",
+      "name": "RDSCluster",
+      "id": "DatabaseId_IsGG9",
+      "type": "RdsDatabase",
+      "rdsInstanceId": "<Instance ID>",
+      "username": "<Username>"
+    },
+    {
+      "failureAndRerunMode": "CASCADE",
+      "resourceRole": "DataPipelineDefaultResourceRole",
+      "role": "DataPipelineDefaultRole",
+      "pipelineLogUri": "s3://data-eng-project2020/Logs/",
+      "scheduleType": "ONDEMAND",
+      "name": "Default",
+      "id": "Default"
+    }
+  ],
+  "parameters": []
+}
