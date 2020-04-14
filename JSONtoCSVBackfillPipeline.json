@@ -1,0 +1,44 @@
+{
+  "objects": [
+    {
+      "stage": "true",
+      "scriptUri": "s3://data-eng-project2020/Scripts/JSONtoCSVBackfill.py",
+      "dependsOn": {
+        "ref": "ShellCommandActivityId_moYvg"
+      },
+      "name": "DefaultShellCommandActivity2",
+      "runsOn": {
+        "ref": "ResourceId_BTWZ6"
+      },
+      "id": "ShellCommandActivityId_dpH3z",
+      "type": "ShellCommandActivity"
+    },
+    {
+      "stage": "true",
+      "scriptUri": "s3://data-eng-project2020/Scripts/ShellCommands.sh",
+      "name": "DefaultShellCommandActivity1",
+      "runsOn": {
+        "ref": "ResourceId_BTWZ6"
+      },
+      "id": "ShellCommandActivityId_moYvg",
+      "type": "ShellCommandActivity"
+    },
+    {
+      "resourceRole": "DataPipelineDefaultResourceRole",
+      "role": "DataPipelineDefaultRole",
+      "name": "DefaultResource1",
+      "id": "ResourceId_BTWZ6",
+      "type": "Ec2Resource"
+    },
+    {
+      "failureAndRerunMode": "CASCADE",
+      "resourceRole": "DataPipelineDefaultResourceRole",
+      "role": "DataPipelineDefaultRole",
+      "pipelineLogUri": "s3://data-eng-project2020/Logs",
+      "scheduleType": "ONDEMAND",
+      "name": "Default",
+      "id": "Default"
+    }
+  ],
+  "parameters": []
+}
