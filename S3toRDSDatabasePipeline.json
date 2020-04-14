@@ -1,0 +1,146 @@
+{
+  "objects": [
+    {
+      "output": {
+        "ref": "DestinationRDSTable"
+      },
+      "input": {
+        "ref": "S3InputDataLocation"
+      },
+      "dependsOn": {
+        "ref": "RdsTableCreateActivity"
+      },
+      "name": "DataLoadActivity",
+      "id": "DataLoadActivity",
+      "runsOn": {
+        "ref": "Ec2Instance"
+      },
+      "type": "CopyActivity"
+    },
+    {
+      "*password": "#{*myRDSPassword}",
+      "name": "rds",
+      "jdbcProperties": "allowMultiQueries=true",
+      "id": "rds",
+      "type": "RdsDatabase",
+      "rdsInstanceId": "#{myRDSInstanceId}",
+      "username": "#{myRDSUsername}"
+    },
+    {
+      "instanceType": "t1.micro",
+      "name": "Ec2Instance",
+      "actionOnTaskFailure": "terminate",
+      "securityGroups": "#{myEc2RdsSecurityGrps}",
+      "id": "Ec2Instance",
+      "type": "Ec2Resource",
+      "terminateAfter": "2 Hours"
+    },
+    {
+      "failureAndRerunMode": "CASCADE",
+      "resourceRole": "DataPipelineDefaultResourceRole",
+      "role": "DataPipelineDefaultRole",
+      "pipelineLogUri": "s3://data-eng-project2020/Logs/",
+      "scheduleType": "ONDEMAND",
+      "name": "Default",
+      "id": "Default"
+    },
+    {
+      "name": "DataFormat1",
+      "id": "DataFormat1",
+      "type": "CSV"
+    },
+    {
+      "database": {
+        "ref": "rds"
+      },
+      "scriptUri": "s3://data-eng-project2020/Scripts/OrdersTableInit.sql",
+      "name": "RdsSqlTableCreateActivity",
+      "runsOn": {
+        "ref": "Ec2Instance"
+      },
+      "id": "RdsTableCreateActivity",
+      "type": "SqlActivity"
+    },
+    {
+      "database": {
+        "ref": "rds"
+      },
+      "name": "DestinationRDSTable",
+      "insertQuery": "#{myRDSTableInsertSql}",
+      "id": "DestinationRDSTable",
+      "type": "SqlDataNode",
+      "table": "#{myRDSTableName}",
+      "selectQuery": "select * from #{table}"
+    },
+    {
+      "directoryPath": "#{myInputS3Loc}",
+      "dataFormat": {
+        "ref": "DataFormat1"
+      },
+      "name": "S3InputDataLocation",
+      "id": "S3InputDataLocation",
+      "type": "S3DataNode"
+    }
+  ],
+  "parameters": [
+    {
+      "description": "RDS password",
+      "id": "*myRDSPassword",
+      "type": "String"
+    },
+    {
+      "watermark": "security group name",
+      "helpText": "The names of one or more EC2 security groups that have access to the RDS cluster.",
+      "description": "RDS security group(s)",
+      "isArray": "true",
+      "optional": "true",
+      "id": "myEc2RdsSecurityGrps",
+      "type": "String"
+    },
+    {
+      "description": "RDS username",
+      "id": "myRDSUsername",
+      "type": "String"
+    },
+    {
+      "description": "Input S3 file path",
+      "id": "myInputS3Loc",
+      "type": "AWS::S3::ObjectKey"
+    },
+    {
+      "helpText": "The SQL statement to insert data into the RDS SQL table.",
+      "watermark": "INSERT INTO #{table} (col1, col2, col3) VALUES(?, ?, ?) ;",
+      "description": "Insert SQL query",
+      "id": "myRDSTableInsertSql",
+      "type": "String"
+    },
+    {
+      "helpText": "The name of an existing table or a new table that will be created based on the create table SQL query parameter below.",
+      "description": "RDS table name",
+      "id": "myRDSTableName",
+      "type": "String"
+    },
+    {
+      "watermark": "CREATE TABLE pet IF NOT EXISTS (name VARCHAR(20), owner VARCHAR(20), species VARCHAR(20), gender CHAR(1), birth DATE, death DATE);",
+      "helpText": "The idempotent SQL statement to create the RDS SQL table if it does not already exist.",
+      "description": "Create table SQL query",
+      "optional": "true",
+      "id": "myRDSCreateTableSql",
+      "type": "String"
+    },
+    {
+      "watermark": "DB Instance",
+      "description": "RDS Instance ID",
+      "id": "myRDSInstanceId",
+      "type": "String"
+    }
+  ],
+  "values": {
+    "myRDSInstanceId": "<RDS Instance ID>",
+    "myRDSUsername": "<RDS Username>",
+    "myRDSTableInsertSql": "<Insert Query>",
+    "*myRDSPassword": "<Password>",
+    "myRDSTableName": "orders_raw",
+    "myInputS3Loc": "s3://data-eng-project2020/OutputData/all_orders.csv"
+  }
+}
